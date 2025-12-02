@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shop, Package, DollarSign, TrendingUp, Store } from 'lucide-react';
+import {Package, DollarSign, TrendingUp, Store } from 'lucide-react';
 import { shopService } from '../../lib/shop';
 import { productService } from '../../lib/products';
 import { orderService } from '../../lib/orders';

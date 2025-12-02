@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { ProductCard } from "../components/ProductCard";
 import { productService } from "../lib/products";
-import { userService } from "../lib/user";
 import api from "../lib/api";
 import type { Product, User } from "../types";
 import { Loader2, Search, ShoppingBag, Store, MapPin } from "lucide-react";
@@ -17,11 +16,6 @@ export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [noShopsNearby, setNoShopsNearby] = useState(false);
-
-  const { ref: heroRef, inView: heroInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
 
   useEffect(() => {
     (async () => {

@@ -77,11 +77,7 @@ export const authService = {
     try {
       const expectedUser = this.getCurrentUser();
       if (!expectedUser) return null;
-      const response = await api.get('/user/getuser', {
-        headers: {
-          Authorization: expectedUser.token ? `Bearer ${expectedUser.token}` : undefined,
-        },
-      });
+      const response = await api.get('/user/getuser');
       const user = response.data.user;
       if (user && user.id === expectedUser.id) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));

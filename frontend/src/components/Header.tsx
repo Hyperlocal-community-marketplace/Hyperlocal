@@ -7,8 +7,7 @@ import {
   Menu,
   Sparkles,
   X,
-  Store,
-  MessageCircle,
+  Store
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { authService } from '../lib/auth';

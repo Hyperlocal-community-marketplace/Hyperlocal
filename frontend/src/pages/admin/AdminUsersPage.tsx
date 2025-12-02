@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, Users, Mail, Calendar } from 'lucide-react';
+import { Trash2, Users, Mail} from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import type { User } from '../../types';

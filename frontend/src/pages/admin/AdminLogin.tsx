@@ -8,7 +8,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -24,7 +24,7 @@ export default function AdminLogin() {
       localStorage.setItem("adminToken", res.data.token);
 
       nav("/admin/dashboard");
-    } catch (err) {
+    } catch (err:any) {
       alert(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);

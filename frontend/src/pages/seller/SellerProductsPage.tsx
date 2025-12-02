@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Plus,
-  Edit2,
   Trash2,
   Package,
   Image as ImageIcon,
@@ -21,7 +20,6 @@ export function SellerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState(shopService.getCurrentSeller());
 
   const [formData, setFormData] = useState({
@@ -150,7 +148,6 @@ export function SellerProductsPage() {
       stock: "",
       images: [],
     });
-    setEditingProduct(null);
   };
 
   if (!seller) {

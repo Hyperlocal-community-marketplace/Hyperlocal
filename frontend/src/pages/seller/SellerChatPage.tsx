@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Send, Loader2, MessageCircle, Sparkles, User as UserIcon } from 'lucide-react';
+import { Send, Loader2, MessageCircle, User as UserIcon } from 'lucide-react';
 import { useSocket } from '../../hooks/useSocket';
 import { chatService } from '../../lib/chat';
 import { shopService } from '../../lib/shop';
@@ -19,7 +19,6 @@ export function SellerChatPage() {
   const [users, setUsers] = useState<{ [key: number]: User }>({});
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [loadingConversations, setLoadingConversations] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
@@ -81,7 +80,6 @@ export function SellerChatPage() {
   useEffect(() => {
     if (!seller) {
       setLoading(false);
-      setLoadingConversations(false);
       return;
     }
     if (loadingRef.current) return;
@@ -89,7 +87,6 @@ export function SellerChatPage() {
     const loadData = async () => {
       loadingRef.current = true;
       setLoading(true);
-      setLoadingConversations(true);
       
       try {
         const data = await chatService.getSellerConversations(seller.id);
@@ -130,7 +127,6 @@ export function SellerChatPage() {
         setConversations([]);
       } finally {
         setLoading(false);
-        setLoadingConversations(false);
         loadingRef.current = false;
       }
     };
@@ -301,7 +297,6 @@ export function SellerChatPage() {
               </div>
             ) : (
               conversations.map((conv) => {
-                const user = users[conv.userId];
                 return (
                   <div
                     key={conv.id}

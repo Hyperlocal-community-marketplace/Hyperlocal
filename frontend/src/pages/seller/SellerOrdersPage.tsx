@@ -5,7 +5,6 @@ import { Package, CheckCircle2, Clock, Truck, XCircle, DollarSign, MessageCircle
 import { orderService } from '../../lib/orders';
 import { shopService } from '../../lib/shop';
 import { chatService } from '../../lib/chat';
-import { userService } from '../../lib/user';
 import { toast } from 'sonner';
 import type { Order } from '../../types';
 

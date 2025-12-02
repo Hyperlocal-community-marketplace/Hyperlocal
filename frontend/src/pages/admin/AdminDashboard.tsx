@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Store, Package, DollarSign, TrendingUp, Truck } from 'lucide-react';
+import { Users, Store, Package, DollarSign, Truck } from 'lucide-react';
 import api from '../../lib/api';
 
 export function AdminDashboard() {
