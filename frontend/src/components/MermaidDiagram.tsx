@@ -25,6 +25,14 @@ mermaid.initialize({
     border2: "#9ca3af",
     fontSize: "14px",
   },
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    curve: "basis",
+    diagramPadding: 8,
+    nodeSpacing: 50,
+    rankSpacing: 50,
+  },
 });
 
 export function MermaidDiagram({ chart, id }: MermaidDiagramProps) {
