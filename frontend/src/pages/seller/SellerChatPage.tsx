@@ -37,36 +37,11 @@ export function SellerChatPage() {
   const handleReceiveMessage = useCallback((message: Message) => {
     if (message.conversationId === selectedConversation?.id) {
       setMessages((prev) => {
-        // Check if message already exists by real ID (most reliable)
-        if (message.id && typeof message.id === 'number') {
+        // Check if message already exists by ID
+        if (message.id) {
           const existingById = prev.find(m => m.id === message.id);
           if (existingById) return prev;
         }
-        
-        // Check if this is a duplicate of an optimistic message (replace it)
-        const optimisticIndex = prev.findIndex(m => {
-          const isTempId = typeof m.id === 'string' && m.id.startsWith('temp-');
-          // Only match by text and sender - ignore timestamp since client/server clocks differ
-          return isTempId && 
-                 m.text === message.text && 
-                 m.sender === message.sender;
-        });
-        
-        if (optimisticIndex !== -1) {
-          // Replace optimistic message with real one
-          const newMessages = [...prev];
-          newMessages[optimisticIndex] = message;
-          return newMessages;
-        }
-        
-        // Check if exact same message already exists (ignore timestamp)
-        const isDuplicate = prev.some(m => 
-          m.text === message.text && 
-          m.sender === message.sender &&
-          typeof m.id === 'number' // Only check against real messages
-        );
-        
-        if (isDuplicate) return prev;
         
         return [...prev, message];
       });
@@ -214,21 +189,7 @@ export function SellerChatPage() {
         senderRole: 'seller',
       };
       
-      // Create optimistic message with unique temporary ID based on timestamp
-      const tempId = `temp-${Date.now()}-${Math.random()}`;
-      const optimisticMessage: Message = {
-        id: tempId,
-        conversationId: selectedConversation.id,
-        sender: senderId,
-        senderRole: 'seller',
-        text: messageText,
-        createdAt: new Date().toISOString(),
-      };
-      
-      // Add optimistic message
-      setMessages((prev) => [...prev, optimisticMessage]);
-      
-      // Emit message
+      // Emit message and wait for server confirmation
       socket.emit('send-message', messageData);
       
       // Reset sending flag after a delay
