@@ -21,14 +21,6 @@ import {
   Layers,
   Activity,
 } from "lucide-react";
-import ReactFlow, {
-  Node,
-  Edge,
-  Background,
-  Controls,
-  MarkerType,
-} from "reactflow";
-import "reactflow/dist/style.css";
 import { MermaidDiagram } from "../components/MermaidDiagram";
 
 export function ProjectDocumentationPage() {
@@ -233,261 +225,107 @@ export function ProjectDocumentationPage() {
   ];
 
   // Buyer Flow Diagram
-  const buyerFlowNodes: Node[] = [
-    {
-      id: "1",
-      type: "input",
-      data: { label: "🌐 Visit Homepage" },
-      position: { x: 250, y: 0 },
-      style: { background: "#3b82f6", color: "white", border: "2px solid #2563eb" },
-    },
-    {
-      id: "2",
-      data: { label: "🔐 Register/Login\n(with ZIP Code)" },
-      position: { x: 250, y: 100 },
-      style: { background: "#8b5cf6", color: "white", border: "2px solid #7c3aed" },
-    },
-    {
-      id: "3",
-      data: { label: "📍 Products Filtered\nby ZIP Code" },
-      position: { x: 250, y: 200 },
-      style: { background: "#10b981", color: "white", border: "2px solid #059669" },
-    },
-    {
-      id: "4",
-      data: { label: "🔍 Browse & Search\nProducts" },
-      position: { x: 100, y: 300 },
-      style: { background: "#f59e0b", color: "white", border: "2px solid #d97706" },
-    },
-    {
-      id: "5",
-      data: { label: "👁️ View Product\nDetails" },
-      position: { x: 400, y: 300 },
-      style: { background: "#f59e0b", color: "white", border: "2px solid #d97706" },
-    },
-    {
-      id: "6",
-      data: { label: "🛒 Add to Cart" },
-      position: { x: 250, y: 400 },
-      style: { background: "#ec4899", color: "white", border: "2px solid #db2777" },
-    },
-    {
-      id: "7",
-      data: { label: "💳 Checkout\n(Stripe Payment)" },
-      position: { x: 250, y: 500 },
-      style: { background: "#6366f1", color: "white", border: "2px solid #4f46e5" },
-    },
-    {
-      id: "8",
-      data: { label: "✅ Order Placed" },
-      position: { x: 250, y: 600 },
-      style: { background: "#14b8a6", color: "white", border: "2px solid #0d9488" },
-    },
-    {
-      id: "9",
-      type: "output",
-      data: { label: "📦 Track Order\n💬 Chat with Seller" },
-      position: { x: 250, y: 700 },
-      style: { background: "#22c55e", color: "white", border: "2px solid #16a34a" },
-    },
-  ];
+  // Mermaid Workflow Diagrams
+  const buyerFlowDiagram = `
+flowchart TD
+    Start([Visit Homepage]) --> Register[Register/Login with ZIP Code]
+    Register --> Filter[Products Filtered by ZIP Code]
+    Filter --> Browse{Choose Action}
+    Browse -->|Search| Search[Browse & Search Products]
+    Browse -->|View Details| Details[View Product Details]
+    Search --> Cart[Add to Cart]
+    Details --> Cart
+    Cart --> Checkout[Checkout with Stripe Payment]
+    Checkout --> OrderPlaced[Order Placed]
+    OrderPlaced --> Track[Track Order]
+    OrderPlaced --> Chat[Chat with Seller]
+    Track --> End([Complete])
+    Chat --> End
 
-  const buyerFlowEdges: Edge[] = [
-    { id: "e1-2", source: "1", target: "2", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e2-3", source: "2", target: "3", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e3-4", source: "3", target: "4", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e3-5", source: "3", target: "5", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e4-6", source: "4", target: "6", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e5-6", source: "5", target: "6", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e6-7", source: "6", target: "7", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e7-8", source: "7", target: "8", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "e8-9", source: "8", target: "9", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-  ];
+    style Start fill:#4ade80
+    style Register fill:#8b5cf6
+    style Filter fill:#10b981
+    style Browse fill:#f59e0b
+    style Cart fill:#ec4899
+    style Checkout fill:#6366f1
+    style OrderPlaced fill:#14b8a6
+    style End fill:#22c55e
+  `;
 
-  // Seller Flow Diagram
-  const sellerFlowNodes: Node[] = [
-    {
-      id: "s1",
-      type: "input",
-      data: { label: "🏪 Register Shop" },
-      position: { x: 250, y: 0 },
-      style: { background: "#8b5cf6", color: "white", border: "2px solid #7c3aed" },
-    },
-    {
-      id: "s2",
-      data: { label: "📊 Seller Dashboard" },
-      position: { x: 250, y: 100 },
-      style: { background: "#a855f7", color: "white", border: "2px solid #9333ea" },
-    },
-    {
-      id: "s3",
-      data: { label: "➕ Add Products\n(Images, Details)" },
-      position: { x: 100, y: 200 },
-      style: { background: "#ec4899", color: "white", border: "2px solid #db2777" },
-    },
-    {
-      id: "s4",
-      data: { label: "📦 Manage Inventory" },
-      position: { x: 400, y: 200 },
-      style: { background: "#f59e0b", color: "white", border: "2px solid #d97706" },
-    },
-    {
-      id: "s5",
-      data: { label: "🔔 Receive Orders" },
-      position: { x: 250, y: 300 },
-      style: { background: "#3b82f6", color: "white", border: "2px solid #2563eb" },
-    },
-    {
-      id: "s6",
-      data: { label: "📝 Update Order Status\n(Processing→Shipped)" },
-      position: { x: 250, y: 400 },
-      style: { background: "#10b981", color: "white", border: "2px solid #059669" },
-    },
-    {
-      id: "s7",
-      data: { label: "💬 Chat with Buyers" },
-      position: { x: 100, y: 500 },
-      style: { background: "#06b6d4", color: "white", border: "2px solid #0891b2" },
-    },
-    {
-      id: "s8",
-      type: "output",
-      data: { label: "💰 Track Revenue\n& Analytics" },
-      position: { x: 400, y: 500 },
-      style: { background: "#22c55e", color: "white", border: "2px solid #16a34a" },
-    },
-  ];
+  const sellerFlowDiagram = `
+flowchart TD
+    Start([Register Shop]) --> Dashboard[Seller Dashboard]
+    Dashboard --> Actions{Select Action}
+    Actions -->|Add| AddProduct[Add Products with Images & Details]
+    Actions -->|Manage| Inventory[Manage Inventory & Stock]
+    AddProduct --> Orders[Receive Orders]
+    Inventory --> Orders
+    Orders --> UpdateStatus[Update Order Status]
+    UpdateStatus --> Processing[Processing]
+    Processing --> Shipped[Shipped]
+    Shipped --> Activities{Seller Activities}
+    Activities -->|Support| Chat[Chat with Buyers]
+    Activities -->|Analytics| Revenue[Track Revenue & Analytics]
+    Chat --> End([Complete])
+    Revenue --> End
 
-  const sellerFlowEdges: Edge[] = [
-    { id: "es1-2", source: "s1", target: "s2", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es2-3", source: "s2", target: "s3", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es2-4", source: "s2", target: "s4", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es3-5", source: "s3", target: "s5", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es4-5", source: "s4", target: "s5", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es5-6", source: "s5", target: "s6", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es6-7", source: "s6", target: "s7", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "es6-8", source: "s6", target: "s8", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-  ];
+    style Start fill:#8b5cf6
+    style Dashboard fill:#a855f7
+    style Actions fill:#f59e0b
+    style AddProduct fill:#ec4899
+    style Inventory fill:#f59e0b
+    style Orders fill:#3b82f6
+    style UpdateStatus fill:#10b981
+    style End fill:#22c55e
+  `;
 
-  // Data Flow Architecture
-  const dataFlowNodes: Node[] = [
-    {
-      id: "client",
-      data: { label: "🖥️ Client Layer\n(React + TypeScript)" },
-      position: { x: 250, y: 0 },
-      style: { background: "#3b82f6", color: "white", border: "2px solid #2563eb", width: 200 },
-    },
-    {
-      id: "api",
-      data: { label: "⚡ API Layer\n(Express + Node.js)" },
-      position: { x: 250, y: 150 },
-      style: { background: "#8b5cf6", color: "white", border: "2px solid #7c3aed", width: 200 },
-    },
-    {
-      id: "auth",
-      data: { label: "🔐 JWT Auth" },
-      position: { x: 50, y: 150 },
-      style: { background: "#f59e0b", color: "white", border: "2px solid #d97706", width: 120 },
-    },
-    {
-      id: "socket",
-      data: { label: "💬 Socket.IO" },
-      position: { x: 450, y: 150 },
-      style: { background: "#06b6d4", color: "white", border: "2px solid #0891b2", width: 120 },
-    },
-    {
-      id: "db",
-      data: { label: "🗄️ MySQL Database\n(10 Tables)" },
-      position: { x: 150, y: 300 },
-      style: { background: "#10b981", color: "white", border: "2px solid #059669", width: 180 },
-    },
-    {
-      id: "stripe",
-      data: { label: "💳 Stripe API\n(Payments)" },
-      position: { x: 350, y: 300 },
-      style: { background: "#ec4899", color: "white", border: "2px solid #db2777", width: 150 },
-    },
-  ];
+  const paymentFlowDiagram = `
+flowchart TD
+    Start([Cart Ready]) --> Shipping[Enter Shipping Information]
+    Shipping --> CardDetails[Enter Card Details - Stripe Elements]
+    CardDetails --> CreateIntent[Create Payment Intent via Backend API]
+    CreateIntent --> StripeProcess[Stripe Processing with 3D Secure]
+    StripeProcess --> Decision{Payment Result}
+    Decision -->|Success| PaySuccess[Payment Successful]
+    Decision -->|Failed| PayFailed[Payment Failed]
+    PaySuccess --> CreateOrder[Create Order - Split by Shop]
+    CreateOrder --> Confirm[Order Confirmation & Clear Cart]
+    Confirm --> End1([Complete])
+    PayFailed --> End2([Retry or Cancel])
 
-  const dataFlowEdges: Edge[] = [
-    { id: "client-api", source: "client", target: "api", label: "HTTP/HTTPS", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "client-socket", source: "client", target: "socket", label: "WebSocket", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "api-auth", source: "api", target: "auth", label: "Verify Token", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "api-db", source: "api", target: "db", label: "SQL Queries", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "api-stripe", source: "api", target: "stripe", label: "Process Payment", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "socket-db", source: "socket", target: "db", label: "Save Messages", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-  ];
+    style Start fill:#3b82f6
+    style CardDetails fill:#ec4899
+    style CreateIntent fill:#f59e0b
+    style StripeProcess fill:#10b981
+    style Decision fill:#f59e0b
+    style PaySuccess fill:#22c55e
+    style PayFailed fill:#ef4444
+    style Confirm fill:#14b8a6
+    style End1 fill:#22c55e
+    style End2 fill:#ef4444
+  `;
 
-  // Payment Flow Diagram
-  const paymentFlowNodes: Node[] = [
-    {
-      id: "p1",
-      type: "input",
-      data: { label: "🛒 Cart Ready" },
-      position: { x: 250, y: 0 },
-      style: { background: "#3b82f6", color: "white", border: "2px solid #2563eb" },
-    },
-    {
-      id: "p2",
-      data: { label: "📋 Enter Shipping\nInformation" },
-      position: { x: 250, y: 100 },
-      style: { background: "#8b5cf6", color: "white", border: "2px solid #7c3aed" },
-    },
-    {
-      id: "p3",
-      data: { label: "💳 Enter Card Details\n(Stripe Elements)" },
-      position: { x: 250, y: 200 },
-      style: { background: "#ec4899", color: "white", border: "2px solid #db2777" },
-    },
-    {
-      id: "p4",
-      data: { label: "🔄 Create Payment Intent\n(Backend API)" },
-      position: { x: 250, y: 300 },
-      style: { background: "#f59e0b", color: "white", border: "2px solid #d97706" },
-    },
-    {
-      id: "p5",
-      data: { label: "🏦 Stripe Processing\n(3D Secure)" },
-      position: { x: 250, y: 400 },
-      style: { background: "#10b981", color: "white", border: "2px solid #059669" },
-    },
-    {
-      id: "p6",
-      data: { label: "✅ Payment Successful" },
-      position: { x: 100, y: 500 },
-      style: { background: "#22c55e", color: "white", border: "2px solid #16a34a" },
-    },
-    {
-      id: "p7",
-      data: { label: "❌ Payment Failed" },
-      position: { x: 400, y: 500 },
-      style: { background: "#ef4444", color: "white", border: "2px solid #dc2626" },
-    },
-    {
-      id: "p8",
-      data: { label: "📦 Create Order\n(Split by Shop)" },
-      position: { x: 100, y: 600 },
-      style: { background: "#6366f1", color: "white", border: "2px solid #4f46e5" },
-    },
-    {
-      id: "p9",
-      type: "output",
-      data: { label: "🎉 Order Confirmation\n& Clear Cart" },
-      position: { x: 100, y: 700 },
-      style: { background: "#14b8a6", color: "white", border: "2px solid #0d9488" },
-    },
-  ];
+  const dataFlowArchitectureDiagram = `
+flowchart TD
+    Client[Client Layer<br/>React + TypeScript] --> API[API Layer<br/>Express + Node.js]
+    Client -.->|WebSocket| Socket[Socket.IO<br/>Real-time Chat]
+    API --> Auth[JWT Auth<br/>Verify Token]
+    API --> DB[(MySQL Database<br/>10 Tables)]
+    API --> Stripe[Stripe API<br/>Payment Processing]
+    Socket --> DB
+    
+    Auth -.->|Authenticated| API
+    DB -.->|Data| API
+    Stripe -.->|Payment Result| API
+    API -.->|Response| Client
 
-  const paymentFlowEdges: Edge[] = [
-    { id: "ep1-2", source: "p1", target: "p2", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "ep2-3", source: "p2", target: "p3", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "ep3-4", source: "p3", target: "p4", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "ep4-5", source: "p4", target: "p5", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "ep5-6", source: "p5", target: "p6", label: "Success", animated: true, markerEnd: { type: MarkerType.ArrowClosed }, style: { stroke: "#22c55e" } },
-    { id: "ep5-7", source: "p5", target: "p7", label: "Failed", animated: true, markerEnd: { type: MarkerType.ArrowClosed }, style: { stroke: "#ef4444" } },
-    { id: "ep6-8", source: "p6", target: "p8", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-    { id: "ep8-9", source: "p8", target: "p9", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-  ];
+    style Client fill:#3b82f6
+    style API fill:#8b5cf6
+    style Auth fill:#f59e0b
+    style Socket fill:#06b6d4
+    style DB fill:#10b981
+    style Stripe fill:#ec4899
+  `;
 
   // Mermaid UML Diagrams
   const relationshipSchema = `
@@ -614,105 +452,114 @@ erDiagram
     }
   `;
 
-  const checkoutSequenceDiagram = `
-sequenceDiagram
-    participant U as User/Browser
-    participant F as Frontend (React)
-    participant A as API Server
-    participant S as Stripe API
-    participant D as Database
+  const checkoutFlowDiagram = `
+flowchart TD
+    Start([User on Checkout Page]) --> ValidateCart{Cart Valid?}
+    ValidateCart -->|No| ShowError[Show Validation Error]
+    ShowError --> End1([End])
+    ValidateCart -->|Yes| CreatePayment[Create Stripe Payment Intent]
+    CreatePayment --> DisplayStripe[Display Stripe Payment Form]
+    DisplayStripe --> ProcessPayment{Process Payment}
+    ProcessPayment -->|3D Secure Required| Verify3DS[Verify 3D Secure]
+    Verify3DS --> CheckPayment{Payment Success?}
+    ProcessPayment -->|Direct| CheckPayment
+    CheckPayment -->|Failed| PaymentError[Show Payment Error]
+    PaymentError --> End2([End])
+    CheckPayment -->|Success| SplitOrders[Split Order by Shop]
+    SplitOrders --> CreateOrders[Create Orders in Database]
+    CreateOrders --> ClearCart[Clear Shopping Cart]
+    ClearCart --> ShowConfetti[Show Success Animation]
+    ShowConfetti --> RedirectOrders[Redirect to Orders Page]
+    RedirectOrders --> End3([End])
 
-    U->>F: Click "Place Order"
-    F->>F: Validate Cart & Form
-    F->>A: POST /api/payment/process {amount}
-    A->>S: Create Payment Intent
-    S-->>A: Return client_secret
-    A-->>F: Return client_secret
-    F->>S: Confirm Card Payment (Stripe Elements)
-    S->>S: Process 3D Secure (if required)
-    
-    alt Payment Successful
-        S-->>F: Payment Success
-        F->>A: POST /api/order/create {cart, shipping, payment}
-        A->>A: Split Order by Shop
-        loop For Each Shop
-            A->>D: INSERT INTO ORDERS
-            D-->>A: Order Created
-        end
-        A-->>F: Orders Created Successfully
-        F->>F: Clear Cart
-        F->>F: Show Confetti 🎉
-        F->>U: Redirect to /orders
-    else Payment Failed
-        S-->>F: Payment Error
-        F->>U: Show Error Toast
-    end
+    style Start fill:#4ade80
+    style End1 fill:#ef4444
+    style End2 fill:#ef4444
+    style End3 fill:#4ade80
+    style ValidateCart fill:#f59e0b
+    style ProcessPayment fill:#f59e0b
+    style CheckPayment fill:#f59e0b
   `;
 
-  const authSequenceDiagram = `
-sequenceDiagram
-    participant U as User
-    participant F as Frontend
-    participant A as API Server
-    participant D as Database
-
-    U->>F: Enter Credentials & ZIP Code
-    F->>A: POST /api/user/register or /login
-    A->>D: Check if User Exists
+  const authFlowDiagram = `
+flowchart TD
+    Start([User Opens Login/Register]) --> EnterCreds[Enter Email, Password & ZIP Code]
+    EnterCreds --> SelectAction{Login or Register?}
+    SelectAction -->|Register| CheckExists[Check if User Exists]
+    CheckExists -->|User Exists| DuplicateError[Show Duplicate Error]
+    DuplicateError --> End1([End])
+    CheckExists -->|New User| HashPassword[Hash Password with bcrypt]
+    HashPassword --> CreateUser[Create User in Database]
+    CreateUser --> GenToken1[Generate JWT Token]
+    GenToken1 --> StoreToken1[Store Token in localStorage]
+    StoreToken1 --> UpdateState1[Update Auth State]
+    UpdateState1 --> RedirectDash1[Redirect to Dashboard]
+    RedirectDash1 --> End2([Success])
     
-    alt Registration
-        D-->>A: User Not Found
-        A->>A: Hash Password (bcrypt)
-        A->>D: INSERT INTO Users
-        D-->>A: User Created
-    else Login
-        D-->>A: Return User Data
-        A->>A: Compare Password (bcrypt)
-    end
+    SelectAction -->|Login| ValidateCreds[Validate Credentials]
+    ValidateCreds --> ComparePass{Password Match?}
+    ComparePass -->|No| ShowError[Show Invalid Credentials]
+    ShowError --> End3([End])
+    ComparePass -->|Yes| GenToken2[Generate JWT Token]
+    GenToken2 --> StoreToken2[Store Token in localStorage]
+    StoreToken2 --> UpdateState2[Update Auth State]
+    UpdateState2 --> RedirectDash2[Redirect to Dashboard]
+    RedirectDash2 --> End4([Success])
 
-    alt Authentication Success
-        A->>A: Generate JWT Token
-        A-->>F: Return {user, token}
-        F->>F: Store Token in localStorage
-        F->>F: Update Auth State
-        F->>U: Redirect to Dashboard
-    else Authentication Failed
-        A-->>F: Return Error
-        F->>U: Show Error Message
-    end
+    style Start fill:#4ade80
+    style End1 fill:#ef4444
+    style End2 fill:#4ade80
+    style End3 fill:#ef4444
+    style End4 fill:#4ade80
+    style SelectAction fill:#f59e0b
+    style ComparePass fill:#f59e0b
   `;
 
-  const orderStateDiagram = `
-stateDiagram-v2
-    [*] --> Pending: Order Created
-    Pending --> Processing: Seller Accepts
-    Processing --> Shipped: Seller Ships
-    Shipped --> Delivered: Customer Receives
-    Delivered --> [*]
+  const orderLifecycleDiagram = `
+flowchart TD
+    Start([Order Created & Paid]) --> Pending[Status: PENDING]
+    Pending --> SellerReview{Seller Reviews Order}
+    SellerReview -->|Accept| Processing[Status: PROCESSING]
+    SellerReview -->|Reject| Cancel1[Status: CANCELLED]
+    Cancel1 --> Refund1[Process Refund]
+    Refund1 --> End1([Order Cancelled])
     
-    Pending --> Cancelled: User/Seller Cancels
-    Processing --> Cancelled: Seller Cancels
-    Cancelled --> [*]
+    Processing --> PrepareOrder[Seller Prepares Items]
+    PrepareOrder --> SellerAction{Seller Action}
+    SellerAction -->|Ship| Shipped[Status: SHIPPED]
+    SellerAction -->|Cancel| Cancel2[Status: CANCELLED]
+    Cancel2 --> Refund2[Process Refund]
+    Refund2 --> End2([Order Cancelled])
+    
+    Shipped --> InTransit[Package in Transit]
+    InTransit --> TrackingUpdates[Tracking Updates Available]
+    TrackingUpdates --> CustomerReceives{Customer Receives?}
+    CustomerReceives -->|Yes| Delivered[Status: DELIVERED]
+    CustomerReceives -->|Lost/Damaged| Support[Contact Support]
+    Support --> Resolution{Resolution}
+    Resolution -->|Refund| Cancel3[Status: CANCELLED]
+    Cancel3 --> End3([Order Cancelled])
+    Resolution -->|Reship| Processing
+    
+    Delivered --> EnableReview[Enable Product Review]
+    EnableReview --> OrderComplete([Order Complete])
 
-    note right of Pending
-        Order just placed
-        Payment completed
-    end note
-
-    note right of Processing
-        Seller preparing order
-        Packaging items
-    end note
-
-    note right of Shipped
-        Order in transit
-        Tracking available
-    end note
-
-    note right of Delivered
-        Order completed
-        Can leave review
-    end note
+    style Start fill:#4ade80
+    style Pending fill:#3b82f6
+    style Processing fill:#f59e0b
+    style Shipped fill:#8b5cf6
+    style Delivered fill:#10b981
+    style Cancel1 fill:#ef4444
+    style Cancel2 fill:#ef4444
+    style Cancel3 fill:#ef4444
+    style End1 fill:#ef4444
+    style End2 fill:#ef4444
+    style End3 fill:#ef4444
+    style OrderComplete fill:#4ade80
+    style SellerReview fill:#f59e0b
+    style SellerAction fill:#f59e0b
+    style CustomerReceives fill:#f59e0b
+    style Resolution fill:#f59e0b
   `;
 
   const classDiagram = `
@@ -1327,7 +1174,7 @@ classDiagram
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  👤 Buyer Flow
+                  Buyer Flow
                 </button>
                 <button
                   onClick={() => setSelectedDiagram("seller")}
@@ -1337,7 +1184,7 @@ classDiagram
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  🏪 Seller Flow
+                  Seller Flow
                 </button>
                 <button
                   onClick={() => setSelectedDiagram("payment")}
@@ -1347,7 +1194,7 @@ classDiagram
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  💳 Payment Flow
+                  Payment Flow
                 </button>
                 <button
                   onClick={() => setSelectedDiagram("dataflow")}
@@ -1357,61 +1204,27 @@ classDiagram
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  ⚡ Data Flow Architecture
+                  Data Flow Architecture
                 </button>
               </div>
 
-              {/* Interactive Diagrams */}
-              <div className="bg-gray-900 rounded-xl border-2 border-gray-700 overflow-hidden">
-                <div className="h-[600px]">
-                  {selectedDiagram === "buyer" && (
-                    <ReactFlow
-                      nodes={buyerFlowNodes}
-                      edges={buyerFlowEdges}
-                      fitView
-                      className="bg-gray-900"
-                    >
-                      <Background color="#374151" gap={16} />
-                      <Controls className="bg-gray-800 border-gray-700" />
-                    </ReactFlow>
-                  )}
-                  
-                  {selectedDiagram === "seller" && (
-                    <ReactFlow
-                      nodes={sellerFlowNodes}
-                      edges={sellerFlowEdges}
-                      fitView
-                      className="bg-gray-900"
-                    >
-                      <Background color="#374151" gap={16} />
-                      <Controls className="bg-gray-800 border-gray-700" />
-                    </ReactFlow>
-                  )}
+              {/* Workflow Diagrams */}
+              <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
+                {selectedDiagram === "buyer" && (
+                  <MermaidDiagram chart={buyerFlowDiagram} />
+                )}
+                
+                {selectedDiagram === "seller" && (
+                  <MermaidDiagram chart={sellerFlowDiagram} />
+                )}
 
-                  {selectedDiagram === "payment" && (
-                    <ReactFlow
-                      nodes={paymentFlowNodes}
-                      edges={paymentFlowEdges}
-                      fitView
-                      className="bg-gray-900"
-                    >
-                      <Background color="#374151" gap={16} />
-                      <Controls className="bg-gray-800 border-gray-700" />
-                    </ReactFlow>
-                  )}
-                  
-                  {selectedDiagram === "dataflow" && (
-                    <ReactFlow
-                      nodes={dataFlowNodes}
-                      edges={dataFlowEdges}
-                      fitView
-                      className="bg-gray-900"
-                    >
-                      <Background color="#374151" gap={16} />
-                      <Controls className="bg-gray-800 border-gray-700" />
-                    </ReactFlow>
-                  )}
-                </div>
+                {selectedDiagram === "payment" && (
+                  <MermaidDiagram chart={paymentFlowDiagram} />
+                )}
+                
+                {selectedDiagram === "dataflow" && (
+                  <MermaidDiagram chart={dataFlowArchitectureDiagram} />
+                )}
               </div>
 
               {/* Workflow Descriptions */}
@@ -1465,29 +1278,32 @@ classDiagram
                 </div>
               </div>
 
-              {/* UML Sequence Diagrams */}
+              {/* Data Flow Diagrams */}
               <div className="mt-8 space-y-6">
-                <h3 className="text-2xl font-bold mb-4">UML Sequence Diagrams</h3>
+                <h3 className="text-2xl font-bold mb-4">Data Flow Diagrams</h3>
+                <p className="text-gray-400 mb-6">
+                  These flowcharts illustrate the complete workflow with start/end nodes, decision points, and process steps.
+                </p>
                 
                 <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
                   <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    🔐 Authentication Flow
+                    Authentication Workflow
                   </h4>
-                  <MermaidDiagram chart={authSequenceDiagram} />
+                  <MermaidDiagram chart={authFlowDiagram} />
                 </div>
 
                 <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
                   <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    💳 Checkout & Payment Flow
+                    Checkout & Payment Workflow
                   </h4>
-                  <MermaidDiagram chart={checkoutSequenceDiagram} />
+                  <MermaidDiagram chart={checkoutFlowDiagram} />
                 </div>
 
                 <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
                   <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    📦 Order Status Lifecycle
+                    Order Lifecycle Workflow
                   </h4>
-                  <MermaidDiagram chart={orderStateDiagram} />
+                  <MermaidDiagram chart={orderLifecycleDiagram} />
                 </div>
               </div>
 
