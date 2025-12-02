@@ -4,6 +4,7 @@ const router = express.Router();
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 const {
   isAuthenticated,
   isSeller,
@@ -64,7 +65,22 @@ router.post(
         return next(new ErrorHandler("Shop already exists", 400));
       }
 
-      const fileUrl = req.file ? req.file.filename : null;
+      // Upload avatar to Cloudinary if provided
+      let avatarUrl = null;
+      if (req.file) {
+        try {
+          const cloudinaryResult = await uploadToCloudinary(req.file.path, 'hyperlocal/shops');
+          avatarUrl = cloudinaryResult.url;
+          // Delete temp file after upload
+          fs.unlink(req.file.path, (err) => {
+            if (err) console.error("Error deleting temp file:", err.message);
+          });
+        } catch (uploadError) {
+          if (req.file) fs.unlink(req.file.path, () => {});
+          return next(new ErrorHandler("Failed to upload image", 500));
+        }
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       if (zipCode) {
         const coords = await getCoordinatesFromPincode(zipCode);
@@ -104,7 +120,7 @@ router.post(
       const [result] = await pool.query(
         `INSERT INTO Shops (name, email, avatar, password, zipcode, address, phoneNumber, createdAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [name, email, fileUrl, hashedPassword, zipCode, address, phoneNumber]
+        [name, email, avatarUrl, hashedPassword, zipCode, address, phoneNumber]
       );
 
       const [shopRows] = await pool.query(
@@ -252,15 +268,23 @@ router.put(
       }
 
       const shop = shops[0];
-      const existAvatarPath = `uploads/${shop.avatar}`;
-      if (fs.existsSync(existAvatarPath)) {
-        fs.unlinkSync(existAvatarPath);
+      
+      // Upload new avatar to Cloudinary
+      let avatarUrl = null;
+      try {
+        const cloudinaryResult = await uploadToCloudinary(req.file.path, 'hyperlocal/shops');
+        avatarUrl = cloudinaryResult.url;
+        // Delete temp file after upload
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error("Error deleting temp file:", err.message);
+        });
+      } catch (uploadError) {
+        if (req.file) fs.unlink(req.file.path, () => {});
+        return next(new ErrorHandler("Failed to upload image", 500));
       }
 
-      const fileUrl = req.file.filename;
-
       await pool.query("UPDATE Shops SET avatar = ? WHERE id = ?", [
-        fileUrl,
+        avatarUrl,
         req.seller.id,
       ]);
 

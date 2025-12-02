@@ -9,6 +9,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const router = express.Router();
 const pool = require("../db/db");
 const { upload } = require("../multer");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 const ErrorHandler = require("../utils/ErrorHandler");
 const fs = require("fs");
 
@@ -43,7 +44,24 @@ router.post(
         );
       }
 
-      const imageUrls = files.map((file) => file.filename);
+      // Upload all images to Cloudinary
+      const imageUrls = [];
+      try {
+        for (const file of files) {
+          const cloudinaryResult = await uploadToCloudinary(file.path, 'hyperlocal/products');
+          imageUrls.push(cloudinaryResult.url);
+          // Delete temp file
+          fs.unlink(file.path, (err) => {
+            if (err) console.error("Error deleting temp file:", err.message);
+          });
+        }
+      } catch (uploadError) {
+        // Clean up any uploaded files on error
+        if (req.files) {
+          req.files.forEach((file) => fs.unlink(file.path, () => {}));
+        }
+        return next(new ErrorHandler("Failed to upload images", 500));
+      }
 
       const productData = {
         shopId: shopId,
@@ -450,19 +468,31 @@ router.put(
       );
       const files = req.files;
       if (files && files.length > 0) {
-        const [oldImages] = await pool.query(
-          "SELECT * FROM ProductImages WHERE productId = ?",
-          [productId]
-        );
-        oldImages.forEach((img) => {
-          const filePath = `uploads/${img.imageUrl}`;
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        });
+        // Delete old images from database (Cloudinary URLs don't need file deletion)
         await pool.query("DELETE FROM ProductImages WHERE productId = ?", [productId]);
-        const insertPromises = files.map((file) =>
+        
+        // Upload new images to Cloudinary
+        const imageUrls = [];
+        try {
+          for (const file of files) {
+            const cloudinaryResult = await uploadToCloudinary(file.path, 'hyperlocal/products');
+            imageUrls.push(cloudinaryResult.url);
+            // Delete temp file
+            fs.unlink(file.path, (err) => {
+              if (err) console.error("Error deleting temp file:", err.message);
+            });
+          }
+        } catch (uploadError) {
+          if (req.files) {
+            req.files.forEach((file) => fs.unlink(file.path, () => {}));
+          }
+          return next(new ErrorHandler("Failed to upload images", 500));
+        }
+        
+        const insertPromises = imageUrls.map((url) =>
           pool.query(
             "INSERT INTO ProductImages (productId, imageUrl) VALUES (?, ?)",
-            [productId, file.filename]
+            [productId, url]
           )
         );
 

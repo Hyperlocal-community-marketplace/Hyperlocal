@@ -58,13 +58,13 @@ export function ChatPage() {
           if (existingById) return prev;
         }
         
-        // Check if this is a duplicate of an optimistic message
+        // Check if this is a duplicate of an optimistic message (replace it)
         const optimisticIndex = prev.findIndex(m => {
           const isTempId = typeof m.id === 'string' && m.id.startsWith('temp-');
+          // Only match by text and sender - ignore timestamp since client/server clocks differ
           return isTempId && 
                  m.text === message.text && 
-                 m.sender === message.sender &&
-                 Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime()) < 5000;
+                 m.sender === message.sender;
         });
         
         if (optimisticIndex !== -1) {
@@ -74,11 +74,11 @@ export function ChatPage() {
           return newMessages;
         }
         
-        // Strict duplicate check: same text, sender, and within 3 seconds
+        // Check if exact same message already exists (ignore timestamp)
         const isDuplicate = prev.some(m => 
           m.text === message.text && 
           m.sender === message.sender &&
-          Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime()) < 3000
+          typeof m.id === 'number' // Only check against real messages
         );
         
         if (isDuplicate) return prev;
