@@ -7,13 +7,14 @@ import {
   Package,
   ShoppingBag,
   LogOut,
-  Sparkles,
   Shield,
 } from 'lucide-react';
 import { adminService } from '../../lib/admin';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import type { Admin } from '../../types';
+
+const API_URL = import.meta.env.VITE_API_URL; // ✅ important for deployment
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -26,15 +27,19 @@ const navItems = [
 export function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+
   const adminStr = localStorage.getItem('admin');
   const admin: Admin | null = adminStr ? JSON.parse(adminStr) : null;
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:3000/api/admin/logout", { credentials: 'include' });
+      await fetch(`${API_URL}/api/admin/logout`, {
+        credentials: 'include',
+      });
     } catch (error) {
       console.error('Admin logout error:', error);
     }
+
     adminService.logout();
     toast.success('Logged out successfully');
     navigate('/login');
@@ -52,7 +57,9 @@ export function AdminSidebar() {
           <div className="p-2 bg-primary rounded-lg">
             <Shield className="h-5 w-5 text-background-dark" />
           </div>
-          <span className="text-xl font-bold text-gray-900 dark:text-white">Admin Portal</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">
+            Admin Portal
+          </span>
         </Link>
       </div>
 
@@ -62,7 +69,7 @@ export function AdminSidebar() {
             <div className="flex items-center gap-3">
               {admin.avatar ? (
                 <img
-                  src={`http://localhost:3000/uploads/${admin.avatar}`}
+                  src={`${API_URL}/uploads/${admin.avatar}`}
                   alt={admin.name}
                   className="w-10 h-10 rounded-full object-cover"
                 />
@@ -71,9 +78,14 @@ export function AdminSidebar() {
                   <Shield className="h-5 w-5 text-white" />
                 </div>
               )}
+
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-white truncate">{admin.name}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{admin.email}</p>
+                <p className="font-semibold text-gray-900 dark:text-white truncate">
+                  {admin.name}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                  {admin.email}
+                </p>
               </div>
             </div>
           </div>
@@ -83,6 +95,7 @@ export function AdminSidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
+
             return (
               <Link
                 key={item.path}
@@ -101,13 +114,6 @@ export function AdminSidebar() {
         </nav>
 
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-          {/* <Link
-            to="/"
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span>Back to Site</span>
-          </Link> */}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors mt-2"
@@ -120,4 +126,3 @@ export function AdminSidebar() {
     </motion.aside>
   );
 }
-
