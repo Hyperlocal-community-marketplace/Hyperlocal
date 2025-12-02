@@ -329,127 +329,133 @@ flowchart TD
 
   // Mermaid UML Diagrams
   const relationshipSchema = `
-erDiagram
-    LOCATIONS }|--|| USERS : "has"
-    LOCATIONS }|--|| SHOPS : "has"
-    SHOPS ||--|| PRODUCTS : "owns"
-    PRODUCTS ||--|| PRODUCT_IMAGES : "has"
-    PRODUCTS ||--|| PRODUCT_REVIEWS : "receives"
-    USERS ||--|| PRODUCT_REVIEWS : "writes"
-    SHOPS ||--|| ORDERS : "receives"
-    USERS ||--|| CONVERSATION : "participates"
-    SHOPS ||--|| CONVERSATION : "participates"
-    CONVERSATION ||--|| MESSAGES : "contains"
-
-    LOCATIONS {
-        string zipCode PK
-        string city
-        string country
-        decimal latitude
-        decimal longitude
-    }
-
-    USERS {
-        int id PK
-        string name
-        string email
-        string password
-        string avatar
-        string phoneNumber
-        string address
-        string zipCode FK
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    SHOPS {
-        int id PK
-        string name
-        string email
-        string password
-        string avatar
-        string address
-        string phoneNumber
-        string zipCode FK
-        text description
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    ADMINS {
-        int id PK
-        string name
-        string email
-        string password
-        string avatar
-        string phoneNumber
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    PRODUCTS {
-        int id PK
-        string name
-        text description
-        string category
-        string tags
-        decimal originalPrice
-        decimal discountPrice
-        int stock
-        decimal ratings
-        int shopId FK
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    PRODUCT_IMAGES {
-        int id PK
-        int productId FK
-        string imageUrl
-        datetime createdAt
-    }
-
-    PRODUCT_REVIEWS {
-        int id PK
-        int productId FK
-        int userId FK
-        decimal rating
-        text comment
-        datetime createdAt
-    }
-
-    ORDERS {
-        int id PK
-        json cart
-        json shippingAddress
-        json user
-        decimal totalPrice
-        json paymentInfo
-        int shopId FK
-        string status
-        datetime deliveredAt
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    CONVERSATION {
-        int id PK
-        string groupTitle
-        int userId FK
-        int sellerId FK
-        text lastMessage
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    MESSAGES {
-        int id PK
-        int conversationId FK
-        int sender
-        enum senderRole
-        text text
-        datetime createdAt
-    }
+graph TB
+    USERS[USER]
+    SHOPS[SELLER]
+    PRODUCTS[PRODUCT]
+    ORDERS[ORDER]
+    REVIEWS[REVIEW]
+    MESSAGES[MESSAGE]
+    LOCATIONS[LOCATIONS]
+    
+    UserId((UserId))
+    Name((Name))
+    Email((Email))
+    
+    SellerId((SellerId))
+    StoreName((StoreName))
+    SellerCategory((Seller_Category))
+    
+    ProductId((ProductId))
+    ProdName((Product Name))
+    Quantity((Quantity))
+    Price((PriceAtPurchase))
+    Status((Status))
+    
+    OrderId((OrderId))
+    OrderDate((OrderDate))
+    OrderStatus((Order Status))
+    
+    Comment((Comment))
+    
+    zipCode((zipCode))
+    
+    USERS --- UserId
+    USERS --- Name
+    USERS --- Email
+    
+    SHOPS --- SellerId
+    SHOPS --- StoreName
+    SHOPS --- SellerCategory
+    
+    PRODUCTS --- ProductId
+    PRODUCTS --- ProdName
+    PRODUCTS --- Quantity
+    PRODUCTS --- Status
+    
+    ORDERS --- OrderId
+    ORDERS --- OrderDate
+    ORDERS --- OrderStatus
+    ORDERS --- Price
+    
+    REVIEWS --- Comment
+    
+    LOCATIONS --- zipCode
+    
+    USERS ---|1| located_in{is_located_in}
+    located_in ---|M| LOCATIONS
+    
+    SHOPS ---|1| shop_located{categorized_in}
+    shop_located ---|1| LOCATIONS
+    
+    SHOPS ---|1| is_for{is_for}
+    is_for ---|M| ORDERS
+    
+    SHOPS ---|1| lists{Lists}
+    lists ---|M| PRODUCTS
+    
+    PRODUCTS ---|1| is_of{is_of}
+    is_of ---|M| REVIEWS
+    
+    PRODUCTS ---|1| order_item{Order_item}
+    order_item ---|M| ORDERS
+    
+    USERS ---|1| writes{writes}
+    writes ---|M| REVIEWS
+    
+    USERS ---|1| places{places}
+    places ---|1| ORDERS
+    
+    ORDERS ---|M| participates_seller{participates_in}
+    participates_seller ---|M| MESSAGES
+    
+    USERS ---|M| participates_user{participates_in}
+    participates_user ---|M| MESSAGES
+    
+    REVIEWS ---|M| is_for_review{is_for}
+    is_for_review ---|1| PRODUCTS
+    
+    style USERS fill:#6366f1,stroke:#4f46e5,stroke-width:3px,color:#000
+    style SHOPS fill:#8b5cf6,stroke:#7c3aed,stroke-width:3px,color:#000
+    style PRODUCTS fill:#ec4899,stroke:#db2777,stroke-width:3px,color:#000
+    style ORDERS fill:#f59e0b,stroke:#d97706,stroke-width:3px,color:#000
+    style REVIEWS fill:#10b981,stroke:#059669,stroke-width:3px,color:#000
+    style MESSAGES fill:#06b6d4,stroke:#0891b2,stroke-width:3px,color:#000
+    style LOCATIONS fill:#14b8a6,stroke:#0d9488,stroke-width:3px,color:#000
+    
+    style UserId fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#000
+    style Name fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#000
+    style Email fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#000
+    
+    style SellerId fill:#ede9fe,stroke:#8b5cf6,stroke-width:2px,color:#000
+    style StoreName fill:#ede9fe,stroke:#8b5cf6,stroke-width:2px,color:#000
+    style SellerCategory fill:#ede9fe,stroke:#8b5cf6,stroke-width:2px,color:#000
+    
+    style ProductId fill:#fce7f3,stroke:#ec4899,stroke-width:2px,color:#000
+    style ProdName fill:#fce7f3,stroke:#ec4899,stroke-width:2px,color:#000
+    style Quantity fill:#fce7f3,stroke:#ec4899,stroke-width:2px,color:#000
+    style Status fill:#fce7f3,stroke:#ec4899,stroke-width:2px,color:#000
+    
+    style OrderId fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#000
+    style OrderDate fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#000
+    style OrderStatus fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#000
+    style Price fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#000
+    
+    style Comment fill:#d1fae5,stroke:#10b981,stroke-width:2px,color:#000
+    
+    style zipCode fill:#ccfbf1,stroke:#14b8a6,stroke-width:2px,color:#000
+    
+    style located_in fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style shop_located fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style is_for fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style lists fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style is_of fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style order_item fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style writes fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style places fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style participates_seller fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style participates_user fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
+    style is_for_review fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
   `;
 
   const checkoutFlowDiagram = `
@@ -1017,7 +1023,7 @@ classDiagram
               </h2>
 
               {/* UML Diagram Selector */}
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-4 mb-6 flex-wrap">
                 <button
                   onClick={() => setSelectedUmlDiagram("er")}
                   className={`px-4 py-2 rounded-lg transition-all ${
@@ -1026,7 +1032,7 @@ classDiagram
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  Relationship Schema
+                  ER Diagram
                 </button>
                 <button
                   onClick={() => setSelectedUmlDiagram("class")}
@@ -1043,7 +1049,7 @@ classDiagram
               {/* ER Diagram */}
               {selectedUmlDiagram === "er" && (
                 <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700 mb-6">
-                  <h3 className="text-xl font-bold mb-4">Database Relationship Schema</h3>
+                  <h3 className="text-xl font-bold mb-4">Entity-Relationship Diagram</h3>
                   <MermaidDiagram chart={relationshipSchema} />
                   <div className="mt-6 grid md:grid-cols-2 gap-4">
                     <div className="bg-gray-800 p-4 rounded">
