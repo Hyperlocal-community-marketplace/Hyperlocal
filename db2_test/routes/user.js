@@ -19,6 +19,7 @@ const {
   getCoordinatesFromPincode,
   getCoordinatesFromZipcode,
 } = require("../utils/geoService");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 
 const deleteOrphanLocation = async (zipCode) => {
   if (!zipCode) return;
@@ -63,11 +64,23 @@ router.post(
         [email]
       );
       if (existingUser.length > 0) {
-        if (req.file) fs.unlink(`uploads/${req.file.filename}`, () => {});
+        if (req.file) fs.unlink(req.file.path, () => {});
         return next(new ErrorHandler("User already exists", 400));
       }
 
-      const fileUrl = req.file ? req.file.filename : null;
+      let avatarUrl = null;
+      if (req.file) {
+        try {
+          const uploadResult = await uploadToCloudinary(req.file.path, 'hyperlocal/avatars');
+          avatarUrl = uploadResult.url;
+          // Delete temp file after upload
+          fs.unlink(req.file.path, () => {});
+        } catch (error) {
+          if (req.file) fs.unlink(req.file.path, () => {});
+          return next(new ErrorHandler("Image upload failed", 500));
+        }
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
 
       if (zipCode) {
@@ -105,7 +118,7 @@ router.post(
       const [result] = await pool.query(
         `INSERT INTO Users (name, email, avatar, password, zipcode, createdAt)
          VALUES (?, ?, ?, ?, ?, NOW())`,
-        [name, email, fileUrl, hashedPassword, zipCode || null]
+        [name, email, avatarUrl, hashedPassword, zipCode || null]
       );
 
       const [userRows] = await pool.query(
