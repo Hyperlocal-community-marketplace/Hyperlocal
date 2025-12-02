@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -18,11 +18,8 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
-  FileCode,
   Layers,
   Activity,
-  Play,
-  Circle,
 } from "lucide-react";
 import ReactFlow, {
   Node,
@@ -30,14 +27,15 @@ import ReactFlow, {
   Background,
   Controls,
   MarkerType,
-  Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { MermaidDiagram } from "../components/MermaidDiagram";
 
 export function ProjectDocumentationPage() {
   const [activeSection, setActiveSection] = useState("overview");
   const [expandedFlow, setExpandedFlow] = useState<string | null>(null);
   const [selectedDiagram, setSelectedDiagram] = useState<string>("buyer");
+  const [selectedUmlDiagram, setSelectedUmlDiagram] = useState<string>("er");
 
   const sections = [
     { id: "overview", name: "Overview", icon: BookOpen },
@@ -491,6 +489,314 @@ export function ProjectDocumentationPage() {
     { id: "ep8-9", source: "p8", target: "p9", animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
   ];
 
+  // Mermaid UML Diagrams
+  const relationshipSchema = `
+erDiagram
+    LOCATIONS }|--|| USERS : "has"
+    LOCATIONS }|--|| SHOPS : "has"
+    SHOPS ||--|| PRODUCTS : "owns"
+    PRODUCTS ||--|| PRODUCT_IMAGES : "has"
+    PRODUCTS ||--|| PRODUCT_REVIEWS : "receives"
+    USERS ||--|| PRODUCT_REVIEWS : "writes"
+    SHOPS ||--|| ORDERS : "receives"
+    USERS ||--|| CONVERSATION : "participates"
+    SHOPS ||--|| CONVERSATION : "participates"
+    CONVERSATION ||--|| MESSAGES : "contains"
+
+    LOCATIONS {
+        string zipCode PK
+        string city
+        string country
+        decimal latitude
+        decimal longitude
+    }
+
+    USERS {
+        int id PK
+        string name
+        string email
+        string password
+        string avatar
+        string phoneNumber
+        string address
+        string zipCode FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SHOPS {
+        int id PK
+        string name
+        string email
+        string password
+        string avatar
+        string address
+        string phoneNumber
+        string zipCode FK
+        text description
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    ADMINS {
+        int id PK
+        string name
+        string email
+        string password
+        string avatar
+        string phoneNumber
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PRODUCTS {
+        int id PK
+        string name
+        text description
+        string category
+        string tags
+        decimal originalPrice
+        decimal discountPrice
+        int stock
+        decimal ratings
+        int shopId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PRODUCT_IMAGES {
+        int id PK
+        int productId FK
+        string imageUrl
+        datetime createdAt
+    }
+
+    PRODUCT_REVIEWS {
+        int id PK
+        int productId FK
+        int userId FK
+        decimal rating
+        text comment
+        datetime createdAt
+    }
+
+    ORDERS {
+        int id PK
+        json cart
+        json shippingAddress
+        json user
+        decimal totalPrice
+        json paymentInfo
+        int shopId FK
+        string status
+        datetime deliveredAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CONVERSATION {
+        int id PK
+        string groupTitle
+        int userId FK
+        int sellerId FK
+        text lastMessage
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    MESSAGES {
+        int id PK
+        int conversationId FK
+        int sender
+        enum senderRole
+        text text
+        datetime createdAt
+    }
+  `;
+
+  const checkoutSequenceDiagram = `
+sequenceDiagram
+    participant U as User/Browser
+    participant F as Frontend (React)
+    participant A as API Server
+    participant S as Stripe API
+    participant D as Database
+
+    U->>F: Click "Place Order"
+    F->>F: Validate Cart & Form
+    F->>A: POST /api/payment/process {amount}
+    A->>S: Create Payment Intent
+    S-->>A: Return client_secret
+    A-->>F: Return client_secret
+    F->>S: Confirm Card Payment (Stripe Elements)
+    S->>S: Process 3D Secure (if required)
+    
+    alt Payment Successful
+        S-->>F: Payment Success
+        F->>A: POST /api/order/create {cart, shipping, payment}
+        A->>A: Split Order by Shop
+        loop For Each Shop
+            A->>D: INSERT INTO ORDERS
+            D-->>A: Order Created
+        end
+        A-->>F: Orders Created Successfully
+        F->>F: Clear Cart
+        F->>F: Show Confetti 🎉
+        F->>U: Redirect to /orders
+    else Payment Failed
+        S-->>F: Payment Error
+        F->>U: Show Error Toast
+    end
+  `;
+
+  const authSequenceDiagram = `
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant A as API Server
+    participant D as Database
+
+    U->>F: Enter Credentials & ZIP Code
+    F->>A: POST /api/user/register or /login
+    A->>D: Check if User Exists
+    
+    alt Registration
+        D-->>A: User Not Found
+        A->>A: Hash Password (bcrypt)
+        A->>D: INSERT INTO Users
+        D-->>A: User Created
+    else Login
+        D-->>A: Return User Data
+        A->>A: Compare Password (bcrypt)
+    end
+
+    alt Authentication Success
+        A->>A: Generate JWT Token
+        A-->>F: Return {user, token}
+        F->>F: Store Token in localStorage
+        F->>F: Update Auth State
+        F->>U: Redirect to Dashboard
+    else Authentication Failed
+        A-->>F: Return Error
+        F->>U: Show Error Message
+    end
+  `;
+
+  const orderStateDiagram = `
+stateDiagram-v2
+    [*] --> Pending: Order Created
+    Pending --> Processing: Seller Accepts
+    Processing --> Shipped: Seller Ships
+    Shipped --> Delivered: Customer Receives
+    Delivered --> [*]
+    
+    Pending --> Cancelled: User/Seller Cancels
+    Processing --> Cancelled: Seller Cancels
+    Cancelled --> [*]
+
+    note right of Pending
+        Order just placed
+        Payment completed
+    end note
+
+    note right of Processing
+        Seller preparing order
+        Packaging items
+    end note
+
+    note right of Shipped
+        Order in transit
+        Tracking available
+    end note
+
+    note right of Delivered
+        Order completed
+        Can leave review
+    end note
+  `;
+
+  const classDiagram = `
+classDiagram
+    class User {
+        +int id
+        +string name
+        +string email
+        +string password
+        +string zipCode
+        +string avatar
+        +register()
+        +login()
+        +updateProfile()
+        +placeOrder()
+        +chatWithSeller()
+    }
+
+    class Shop {
+        +int id
+        +string name
+        +string email
+        +string zipCode
+        +string description
+        +register()
+        +addProduct()
+        +updateProduct()
+        +processOrder()
+        +chatWithBuyer()
+    }
+
+    class Product {
+        +int id
+        +string name
+        +decimal price
+        +int stock
+        +int shopId
+        +string[] images
+        +create()
+        +update()
+        +delete()
+        +addReview()
+    }
+
+    class Order {
+        +int id
+        +json cart
+        +decimal totalPrice
+        +string status
+        +int shopId
+        +create()
+        +updateStatus()
+        +getByUser()
+        +getByShop()
+    }
+
+    class CartService {
+        -CartItem[] items
+        +addItem()
+        +removeItem()
+        +updateQuantity()
+        +clearCart()
+        +getTotal()
+    }
+
+    class AuthService {
+        -string token
+        +login()
+        +register()
+        +logout()
+        +isAuthenticated()
+        +getCurrentUser()
+    }
+
+    User "1" --> "*" Order : places
+    Shop "1" --> "*" Product : owns
+    Shop "1" --> "*" Order : receives
+    Product "*" --> "1" Shop : belongs to
+    Order "*" --> "1" User : placed by
+    User --> CartService : uses
+    User --> AuthService : authenticates
+    Shop --> AuthService : authenticates
+  `;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       {/* Header */}
@@ -863,7 +1169,75 @@ export function ProjectDocumentationPage() {
                 Database Schema
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {/* UML Diagram Selector */}
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => setSelectedUmlDiagram("er")}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    selectedUmlDiagram === "er"
+                      ? "bg-primary text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  Relationship Schema
+                </button>
+                <button
+                  onClick={() => setSelectedUmlDiagram("class")}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    selectedUmlDiagram === "class"
+                      ? "bg-primary text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  Class Diagram
+                </button>
+              </div>
+
+              {/* ER Diagram */}
+              {selectedUmlDiagram === "er" && (
+                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700 mb-6">
+                  <h3 className="text-xl font-bold mb-4">Database Relationship Schema</h3>
+                  <MermaidDiagram chart={relationshipSchema} />
+                  <div className="mt-6 grid md:grid-cols-2 gap-4">
+                    <div className="bg-gray-800 p-4 rounded">
+                      <h4 className="font-semibold text-indigo-400 mb-2">Key Relationships</h4>
+                      <ul className="text-sm text-gray-400 space-y-1">
+                        <li>• Locations linked to Users and Shops via ZIP code</li>
+                        <li>• Shops own multiple Products</li>
+                        <li>• Products have multiple Images and Reviews</li>
+                        <li>• Orders split by Shop for multi-vendor support</li>
+                        <li>• Conversations enable real-time chat</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-800 p-4 rounded">
+                      <h4 className="font-semibold text-purple-400 mb-2">Database Features</h4>
+                      <ul className="text-sm text-gray-400 space-y-1">
+                        <li>• Geospatial queries for proximity search</li>
+                        <li>• Multi-vendor order management</li>
+                        <li>• Real-time messaging support</li>
+                        <li>• Product ratings and reviews</li>
+                        <li>• Secure password hashing (bcrypt)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Class Diagram */}
+              {selectedUmlDiagram === "class" && (
+                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700 mb-6">
+                  <h3 className="text-xl font-bold mb-4">Class Diagram</h3>
+                  <MermaidDiagram chart={classDiagram} />
+                  <div className="mt-6 bg-gray-800 p-4 rounded">
+                    <h4 className="font-semibold text-green-400 mb-2">Core Business Logic</h4>
+                    <p className="text-sm text-gray-400">
+                      The class diagram shows the object-oriented structure of our application with services handling authentication, cart management, and business operations.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {databaseTables.map((table, idx) => (
                   <motion.div
                     key={idx}
@@ -882,50 +1256,6 @@ export function ProjectDocumentationPage() {
                     <div className="text-sm text-gray-500">{table.desc}</div>
                   </motion.div>
                 ))}
-              </div>
-
-              {/* ER Diagram Visual */}
-              <div className="mt-8 bg-gray-900/50 rounded-xl p-6 border border-gray-700">
-                <h3 className="text-xl font-bold mb-4">
-                  Entity Relationships
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="bg-blue-600/20 border-2 border-blue-500 rounded-lg p-4 mb-2">
-                      <div className="font-bold">Users</div>
-                      <div className="text-sm text-gray-400">Buyers</div>
-                    </div>
-                    <ArrowRight className="h-6 w-6 mx-auto text-gray-600 rotate-90 my-2" />
-                    <div className="bg-green-600/20 border-2 border-green-500 rounded-lg p-4">
-                      <div className="font-bold">Orders</div>
-                      <div className="text-sm text-gray-400">Purchases</div>
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="bg-purple-600/20 border-2 border-purple-500 rounded-lg p-4 mb-2">
-                      <div className="font-bold">Shops</div>
-                      <div className="text-sm text-gray-400">Sellers</div>
-                    </div>
-                    <ArrowRight className="h-6 w-6 mx-auto text-gray-600 rotate-90 my-2" />
-                    <div className="bg-orange-600/20 border-2 border-orange-500 rounded-lg p-4">
-                      <div className="font-bold">Products</div>
-                      <div className="text-sm text-gray-400">Inventory</div>
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="bg-cyan-600/20 border-2 border-cyan-500 rounded-lg p-4 mb-2">
-                      <div className="font-bold">Conversation</div>
-                      <div className="text-sm text-gray-400">Chat Rooms</div>
-                    </div>
-                    <ArrowRight className="h-6 w-6 mx-auto text-gray-600 rotate-90 my-2" />
-                    <div className="bg-pink-600/20 border-2 border-pink-500 rounded-lg p-4">
-                      <div className="font-bold">Messages</div>
-                      <div className="text-sm text-gray-400">Chat Data</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </motion.div>
@@ -1132,6 +1462,32 @@ export function ProjectDocumentationPage() {
                     <li>• MySQL database</li>
                     <li>• Real-time Socket.IO</li>
                   </ul>
+                </div>
+              </div>
+
+              {/* UML Sequence Diagrams */}
+              <div className="mt-8 space-y-6">
+                <h3 className="text-2xl font-bold mb-4">UML Sequence Diagrams</h3>
+                
+                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
+                  <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    🔐 Authentication Flow
+                  </h4>
+                  <MermaidDiagram chart={authSequenceDiagram} />
+                </div>
+
+                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
+                  <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    💳 Checkout & Payment Flow
+                  </h4>
+                  <MermaidDiagram chart={checkoutSequenceDiagram} />
+                </div>
+
+                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
+                  <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    📦 Order Status Lifecycle
+                  </h4>
+                  <MermaidDiagram chart={orderStateDiagram} />
                 </div>
               </div>
 
