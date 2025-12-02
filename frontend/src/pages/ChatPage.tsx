@@ -52,9 +52,11 @@ export function ChatPage() {
   const handleReceiveMessage = useCallback((message: Message) => {
     if (message.conversationId === selectedConversation?.id) {
       setMessages((prev) => {
-        // Check if message already exists by real ID
-        const existingById = prev.find(m => m.id && m.id === message.id && typeof m.id === 'number');
-        if (existingById) return prev;
+        // Check if message already exists by real ID (most reliable)
+        if (message.id && typeof message.id === 'number') {
+          const existingById = prev.find(m => m.id === message.id);
+          if (existingById) return prev;
+        }
         
         // Check if this is a duplicate of an optimistic message
         const optimisticIndex = prev.findIndex(m => {
@@ -72,13 +74,14 @@ export function ChatPage() {
           return newMessages;
         }
         
-        // Check if message already exists by text and sender (fallback)
-        const existingByContent = prev.find(m => 
+        // Strict duplicate check: same text, sender, and within 3 seconds
+        const isDuplicate = prev.some(m => 
           m.text === message.text && 
           m.sender === message.sender &&
-          Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime()) < 2000
+          Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime()) < 3000
         );
-        if (existingByContent) return prev;
+        
+        if (isDuplicate) return prev;
         
         return [...prev, message];
       });
