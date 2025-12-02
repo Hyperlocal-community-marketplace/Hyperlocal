@@ -103,7 +103,10 @@ io.on("connection", (socket) => {
       // Get the inserted message and broadcast it
       const [messages] = await pool.query("SELECT * FROM MESSAGES WHERE id = ?", [result.insertId]);
       if (messages.length > 0) {
-        io.to(String(convId)).emit("receive-message", messages[0]);
+        // Broadcast to everyone in the room EXCEPT the sender
+        socket.to(String(convId)).emit("receive-message", messages[0]);
+        // Also send to sender for confirmation (replaces optimistic message)
+        socket.emit("receive-message", messages[0]);
       }
     } catch (error) {
       socket.emit("error", { message: "Failed to send message" });
