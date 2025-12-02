@@ -27,9 +27,16 @@ const app = express();
 const server = http.createServer(app);
 
 // Initialize Socket.IO
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5174";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  FRONTEND_URL
+].filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -117,7 +124,7 @@ app.set("io", io);
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
@@ -147,6 +154,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Backend server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Backend server running on port ${PORT}`);
 });

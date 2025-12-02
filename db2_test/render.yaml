@@ -1,0 +1,3 @@
+version: 2
+buildCommand: npm install && npm run build
+startCommand: node server.js
