@@ -9,6 +9,7 @@ import { authService } from '../lib/auth';
 import { ProductCard } from '../components/ProductCard';
 import type { Shop, Product } from '../types';
 import { toast } from 'sonner';
+import { getImageUrl } from '../lib/image';
 
 export function ShopProfilePage() {
   const { id } = useParams<{ id: string }>();

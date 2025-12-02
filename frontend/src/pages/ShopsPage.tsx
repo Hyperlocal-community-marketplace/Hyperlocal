@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Store, MapPin, Phone, Mail, Search, Loader2, Sparkles } from 'lucide-react';
 import { shopService } from '../lib/shop';
 import type { Shop } from '../types';
+import { getImageUrl } from '../lib/image';
 
 export function ShopsPage() {
   const navigate = useNavigate();
