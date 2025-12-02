@@ -1,7 +1,9 @@
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 export const adminService = {
   login: async (email: string, password: string) => {
     try {
-      const res = await fetch("http://localhost:3000/api/admin/login", {
+      const res = await fetch(`${API_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
