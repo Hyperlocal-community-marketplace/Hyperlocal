@@ -73,25 +73,50 @@ export function SellerSettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      e.target.value = '';
+      return;
+    }
+
+    const maxSizeInMb = 5;
+    if (file.size > maxSizeInMb * 1024 * 1024) {
+      toast.error(`Image size must be under ${maxSizeInMb}MB`);
+      e.target.value = '';
+      return;
+    }
+
     try {
       setUploading(true);
-      const formData = new FormData();
-      formData.append('image', file);
+      const payload = new FormData();
+      payload.append('image', file);
 
-      const response = await api.put('/shop/update-shop-avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const { success, seller, error } = await shopService.updateAvatar(payload);
+      if (!success || !seller) {
+        toast.error(error || 'Failed to update avatar');
+        return;
+      }
+
+      setShop(seller);
+      setFormData({
+        name: seller.name || '',
+        email: seller.email || '',
+        description: seller.description || '',
+        address: seller.address || '',
+        phoneNumber: seller.phoneNumber || '',
+        zipCode: seller.zipCode || '',
       });
-      
-      setShop(response.data.seller);
       toast.success('Avatar updated successfully!');
-      shopService.logout(); // Force refresh token
-      const newResponse = await api.get('/shop/getSeller');
-      localStorage.setItem('seller', JSON.stringify(newResponse.data.seller));
-      window.location.reload();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update avatar');
+      window.dispatchEvent(new Event('authStateChanged'));
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to update avatar';
+      toast.error(message);
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 

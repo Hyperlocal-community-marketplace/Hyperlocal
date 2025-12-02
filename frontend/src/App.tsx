@@ -15,6 +15,7 @@ import { LoginPage } from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import { ShopsPage } from "./pages/ShopsPage";
 import { ShopProfilePage } from "./pages/ShopProfilePage";
+import { ProjectDocumentationPage } from "./pages/ProjectDocumentationPage";
 
 import { SellerLayout } from "./layouts/SellerLayout";
 import { AdminLayout } from "./layouts/AdminLayout";
@@ -108,6 +109,7 @@ function BuyerLayout() {
           />
 
           <Route path="login" element={<LoginPage />} />
+          <Route path="documentation" element={<ProjectDocumentationPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>
