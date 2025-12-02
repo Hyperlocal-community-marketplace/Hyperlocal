@@ -1,4 +1,7 @@
-require("dotenv").config({ path: "./config/.env" });
+// Load .env only in development (Render provides env vars directly)
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: "./config/.env" });
+}
 
 const express = require("express");
 const path = require("path");
