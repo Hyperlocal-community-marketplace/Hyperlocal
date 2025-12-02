@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 import { ProductCard } from "../components/ProductCard";
 import { productService } from "../lib/products";
 import api from "../lib/api";
