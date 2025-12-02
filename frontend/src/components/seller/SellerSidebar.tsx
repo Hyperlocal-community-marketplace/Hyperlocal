@@ -13,6 +13,7 @@ import {
 import { shopService } from '../../lib/shop';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../../lib/image';
 
 const navItems = [
   { path: '/seller/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -55,7 +56,7 @@ export function SellerSidebar() {
             <div className="flex items-center gap-3">
               {seller.avatar ? (
                 <img
-                  src={`http://localhost:3000/uploads/${seller.avatar}`}
+                  src={getImageUrl(seller.avatar)}
                   alt={seller.name}
                   className="w-10 h-10 rounded-full object-cover"
                 />

@@ -6,6 +6,7 @@ import { cartService } from '../lib/cart';
 import type { CartItem } from '../types';
 import { toast } from 'sonner';
 import api from '../lib/api';
+import { getImageUrl } from '../lib/image';
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -160,7 +161,7 @@ export function CartPage() {
                 >
                   <motion.div whileHover={{ scale: 1.05 }}>
                     <img
-                      src={item.image.startsWith('http') ? item.image : `http://localhost:3000/uploads/${item.image}`}
+                      src={getImageUrl(item.image)}
                       alt={item.productName}
                       className="w-32 h-32 object-cover rounded-xl shadow-lg"
                     />

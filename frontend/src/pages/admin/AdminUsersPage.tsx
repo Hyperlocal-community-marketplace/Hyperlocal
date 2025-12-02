@@ -4,6 +4,7 @@ import { Trash2, Users, Mail} from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import type { User } from '../../types';
+import { getImageUrl } from '../../lib/image';
 
 export function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -88,7 +89,7 @@ export function AdminUsersPage() {
                     <div className="flex items-center">
                       {user.avatar ? (
                         <img
-                          src={`http://localhost:3000/uploads/${user.avatar}`}
+                          src={getImageUrl(user.avatar)}
                           alt={user.name}
                           className="h-10 w-10 rounded-full object-cover mr-3"
                         />

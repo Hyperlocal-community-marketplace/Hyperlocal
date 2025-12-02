@@ -4,6 +4,7 @@ import { productService } from "../../lib/products";
 import { shopService } from "../../lib/shop";
 import { ArrowLeft, Star, Package, Edit2 } from "lucide-react";
 import { toast } from "sonner";
+import { getImageUrl } from "../../lib/image";
 
 export function SellerProductDetails() {
   const { id } = useParams();
@@ -58,7 +59,7 @@ export function SellerProductDetails() {
 
       <div className="flex gap-6">
         <img
-          src={`http://localhost:3000/uploads/${product.images?.[0]}`}
+          src={getImageUrl(product.images?.[0])}
           alt={product.name}
           className="w-64 h-64 object-cover rounded-lg border"
         />

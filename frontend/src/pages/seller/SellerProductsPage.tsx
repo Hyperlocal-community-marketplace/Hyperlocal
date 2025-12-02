@@ -14,6 +14,7 @@ import api from "../../lib/api";
 import { toast } from "sonner";
 import type { Product } from "../../types";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../lib/image";
 
 export function SellerProductsPage() {
   const navigate = useNavigate();
@@ -245,7 +246,7 @@ export function SellerProductsPage() {
             >
               {product.images && product.images.length > 0 ? (
                 <img
-                  src={`http://localhost:3000/uploads/${product.images[0]}`}
+                  src={getImageUrl(product.images[0])}
                   alt={product.name}
                   className="w-full h-48 object-cover"
                 />

@@ -5,6 +5,7 @@ import { shopService } from '../../lib/shop';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import type { Shop } from '../../types';
+import { getImageUrl } from '../../lib/image';
 
 export function SellerSettingsPage() {
   const [shop, setShop] = useState<Shop | null>(null);
@@ -146,7 +147,7 @@ export function SellerSettingsPage() {
             <div className="flex flex-col items-center">
               {shop?.avatar ? (
                 <img
-                  src={`http://localhost:3000/uploads/${shop.avatar}`}
+                  src={getImageUrl(shop.avatar)}
                   alt={shop.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary mb-4"
                 />

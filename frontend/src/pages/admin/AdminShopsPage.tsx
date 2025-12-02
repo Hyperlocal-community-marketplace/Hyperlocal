@@ -4,6 +4,7 @@ import { Trash2, Store, Mail, MapPin } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import type { Shop } from '../../types';
+import { getImageUrl } from '../../lib/image';
 
 export function AdminShopsPage() {
   const [shops, setShops] = useState<Shop[]>([]);
@@ -66,7 +67,7 @@ export function AdminShopsPage() {
               <div className="flex items-center gap-3">
                 {shop.avatar ? (
                   <img
-                    src={`http://localhost:3000/uploads/${shop.avatar}`}
+                    src={getImageUrl(shop.avatar)}
                     alt={shop.name}
                     className="w-12 h-12 rounded-full object-cover"
                   />

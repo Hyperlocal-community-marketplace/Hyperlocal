@@ -130,9 +130,7 @@ export function ShopProfilePage() {
     }
   };
 
-  const avatarUrl = shop.avatar
-    ? `http://localhost:3000/uploads/${shop.avatar}`
-    : undefined;
+  const avatarUrl = getImageUrl(shop.avatar);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">

@@ -133,9 +133,7 @@ export function ShopsPage() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filteredShops.map((shop, index) => {
-              const avatarUrl = shop.avatar
-                ? `http://localhost:3000/uploads/${shop.avatar}`
-                : undefined;
+              const avatarUrl = getImageUrl(shop.avatar);
 
               return (
                 <motion.div

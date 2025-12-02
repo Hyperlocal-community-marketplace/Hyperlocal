@@ -2,15 +2,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, Sparkles, Zap } from 'lucide-react';
 import type { Product } from '../types';
+import { getImageUrl } from '../lib/image';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const imageUrl = product.images && product.images.length > 0
-    ? `http://localhost:3000/uploads/${product.images[0]}`
-    : 'https://via.placeholder.com/400';
+  const imageUrl = getImageUrl(product.images?.[0]);
   
   // Convert prices to numbers (they might come as strings from the database)
   const originalPrice = Number(product.originalPrice) || 0;

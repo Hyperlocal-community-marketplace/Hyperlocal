@@ -5,6 +5,7 @@ import { shopService } from '../../lib/shop';
 import { productService } from '../../lib/products';
 import { orderService } from '../../lib/orders';
 import type { Shop as ShopType, Product, Order } from '../../types';
+import { getImageUrl } from '../../lib/image';
 
 export function SellerDashboard() {
   const [shop, setShop] = useState<ShopType | null>(null);
@@ -177,7 +178,7 @@ export function SellerDashboard() {
                 >
                   {product.images && product.images.length > 0 && (
                     <img
-                      src={`http://localhost:3000/uploads/${product.images[0]}`}
+                      src={getImageUrl(product.images[0])}
                       alt={product.name}
                       className="w-12 h-12 rounded object-cover"
                     />

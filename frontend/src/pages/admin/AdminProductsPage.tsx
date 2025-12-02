@@ -4,6 +4,7 @@ import { Trash2, Package, Image as ImageIcon, Store } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import type { Product } from '../../types';
+import { getImageUrl } from '../../lib/image';
 
 export function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -64,7 +65,7 @@ export function AdminProductsPage() {
           >
             {product.images && product.images.length > 0 ? (
               <img
-                src={`http://localhost:3000/uploads/${product.images[0]}`}
+                src={getImageUrl(product.images[0])}
                 alt={product.name}
                 className="w-full h-48 object-cover"
               />

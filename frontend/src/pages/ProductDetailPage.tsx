@@ -9,6 +9,7 @@ import { chatService } from '../lib/chat';
 import { authService } from '../lib/auth';
 import type { Product, Shop } from '../types';
 import { toast } from 'sonner';
+import { getImageUrl } from '../lib/image';
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -201,9 +202,7 @@ export function ProductDetailPage() {
     );
   }
 
-  const imageUrl = product.images && product.images.length > 0
-    ? `http://localhost:3000/uploads/${product.images[0]}`
-    : 'https://via.placeholder.com/600';
+  const imageUrl = getImageUrl(product.images?.[0]);
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
@@ -534,7 +533,7 @@ export function ProductDetailPage() {
                   <div className="flex items-start gap-4 mb-4">
                     {review.user?.avatar ? (
                       <img
-                        src={`http://localhost:3000/uploads/${review.user.avatar}`}
+                        src={getImageUrl(review.user.avatar)}
                         alt={review.user.name}
                         className="w-12 h-12 rounded-full object-cover"
                       />
