@@ -23,6 +23,8 @@ export function CartPage() {
   const loadAndValidateCart = async () => {
     const localCart = cartService.getCart();
     
+    console.log('Loading cart from localStorage:', localCart);
+    
     // If cart is empty, no need to validate
     if (localCart.length === 0) {
       setCart(localCart);
@@ -30,9 +32,13 @@ export function CartPage() {
       return;
     }
 
+    // For now, just load the cart without backend validation
+    // This ensures the cart works even if API is temporarily unavailable
+    setCart(localCart);
+    setValidating(false);
+
+    // Try to validate in the background (optional)
     try {
-      setValidating(true);
-      // Validate cart items with backend
       const response = await api.post('/product/validate-cart', {
         cartItems: localCart,
       });
@@ -64,16 +70,12 @@ export function CartPage() {
           toast.error(`${removedProducts.length} products are no longer available and were removed from your cart`);
         }
 
+        setCart(validProducts);
         window.dispatchEvent(new Event('cartUpdated'));
       }
-
-      setCart(validProducts || localCart);
     } catch (error) {
-      console.error('Error validating cart:', error);
-      // On error, just use the local cart
-      setCart(localCart);
-    } finally {
-      setValidating(false);
+      console.error('Error validating cart (non-fatal):', error);
+      // Cart is already loaded, so validation failure doesn't break the cart
     }
   };
 
