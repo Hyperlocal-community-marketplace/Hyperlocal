@@ -82,7 +82,8 @@ export function CheckoutPage() {
       const { fullName, email, phone, address, zipCode } = formData;
       const finalAmount = Math.round(total * 1.08 * 100);
 
-      const response = await fetch("http://localhost:3000/api/payment/process", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const response = await fetch(`${API_URL}/api/payment/process`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: finalAmount }),
